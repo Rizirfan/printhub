@@ -100,10 +100,13 @@ const LandingPage = () => {
             className="glass-panel"
             style={{ padding: '1rem', borderRadius: '24px', position: 'relative', zIndex: 2 }}
           >
-            <img 
-              src="https://cdn.pixabay.com/photo/2017/06/18/16/13/printer-2416269_1280.jpg" 
-              alt="Advanced 3D Printer" 
-              style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: '16px' }} 
+            <video 
+              src="/hero-video.mp4" 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: '16px', display: 'block' }} 
             />
           </motion.div>
           {/* Abstract background shapes */}
