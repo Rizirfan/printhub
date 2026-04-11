@@ -1,16 +1,56 @@
-import React from 'react';
-import { Printer, Clock, CheckCircle, DollarSign, Inbox, Activity } from 'lucide-react';
+import React, { useState } from 'react';
+import { Printer, Clock, CheckCircle, DollarSign, Inbox, Activity, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const VendorDashboard = () => (
-  <div className="animate-fade-in" style={{ marginTop: '2rem', paddingBottom: '4rem' }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-      <div>
-        <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>Partner <span className="gradient-text">Dashboard</span></h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Manage your incoming print jobs and printing farm.</p>
+interface Job {
+  id: string;
+  item: string;
+  material: string;
+  quality: string;
+  status: 'Pending' | 'In Progress' | 'Shipped' | 'Delivered';
+  rev: string;
+  time: string;
+  timestamp: Date;
+}
+
+const VendorDashboard = ({ jobs, updateJobStatus }: { jobs: Job[], updateJobStatus: (id: string, status: Job['status']) => void }) => {
+  const [printers, setPrinters] = useState([
+    { name: 'Prusa MK3S+', status: 'Printing (45%)', color: 'var(--warning)', active: true, progress: '45%' },
+    { name: 'Bambu Lab X1C', status: 'Printing (12%)', color: 'var(--warning)', active: true, progress: '12%' },
+    { name: 'Elegoo Mars 3', status: 'Idle', color: 'var(--success)', active: false, progress: '0%' },
+  ]);
+
+  const handleAddPrinter = () => {
+    const printerNames = ['Creality Ender 3', 'Anycubic Photon', 'Voron 2.4'];
+    const randomName = printerNames[Math.floor(Math.random() * printerNames.length)];
+    setPrinters(prev => [...prev, {
+      name: randomName,
+      status: 'Idle',
+      color: 'var(--success)',
+      active: false,
+      progress: '0%'
+    }]);
+  };
+
+  const handleJobAction = (id: string, currentStatus: Job['status']) => {
+    if (currentStatus === 'Pending') {
+      updateJobStatus(id, 'In Progress');
+    } else if (currentStatus === 'In Progress') {
+      updateJobStatus(id, 'Shipped');
+    } else if (currentStatus === 'Shipped') {
+      updateJobStatus(id, 'Delivered');
+    }
+  };
+
+  return (
+    <div className="animate-fade-in" style={{ marginTop: '2rem', paddingBottom: '4rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+        <div>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>Partner <span className="gradient-text">Dashboard</span></h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Manage your incoming print jobs and printing farm.</p>
+        </div>
+        <button className="btn btn-primary" onClick={handleAddPrinter}><Plus size={18} /> Add New Printer</button>
       </div>
-      <button className="btn btn-primary"><Printer size={18} /> Add New Printer</button>
-    </div>
 
     {/* Stats Row */}
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
@@ -39,12 +79,8 @@ const VendorDashboard = () => (
          <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Inbox size={20} color="var(--accent-primary)" /> Incoming Print Jobs
          </h3>
-         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-           {[
-             { id: '#ORD-0921', item: 'Mechanical Keyboard Case', material: 'PLA Black', time: '6h 30m', rev: '$45.00', status: 'Pending' },
-             { id: '#ORD-0922', item: 'D&D Miniatures Set x4', material: 'Resin Gray', time: '2h 15m', rev: '$18.50', status: 'In Progress' },
-             { id: '#ORD-0923', item: 'Drone Frame Prototype', material: 'ABS White', time: '8h 00m', rev: '$62.00', status: 'Pending' },
-           ].map((job, i) => (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {jobs.filter(j => j.status !== 'Delivered').map((job, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.2rem', background: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px solid var(--border-color)', transition: 'all 0.2s' }}>
                  <div>
                    <p style={{ fontWeight: 600, marginBottom: '0.35rem', fontSize: '1.05rem' }}>{job.item}</p>
@@ -53,14 +89,26 @@ const VendorDashboard = () => (
                    </p>
                  </div>
                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                   <span style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '1.1rem' }}>{job.rev}</span>
-                   <button className={`btn ${job.status === 'Pending' ? 'btn-primary' : 'btn-secondary'}`} style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
-                     {job.status === 'Pending' ? 'Accept Job' : 'Update Status'}
+                   <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                     <span style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '1.1rem' }}>{job.rev}</span>
+                     <span style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', textTransform: 'uppercase', fontWeight: 700 }}>{job.status}</span>
+                   </div>
+                   <button 
+                    className={`btn ${job.status === 'Pending' ? 'btn-primary' : 'btn-secondary'}`} 
+                    style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
+                    onClick={() => handleJobAction(job.id, job.status)}
+                   >
+                     {job.status === 'Pending' ? 'Accept Job' : job.status === 'In Progress' ? 'Ship Item' : 'Mark Delivered'}
                    </button>
                  </div>
               </div>
-           ))}
-         </div>
+            ))}
+            {jobs.filter(j => j.status !== 'Delivered').length === 0 && (
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
+                No active jobs. Upload something from the Customer Portal!
+              </div>
+            )}
+          </div>
       </div>
 
       {/* Printer Status */}
@@ -68,12 +116,8 @@ const VendorDashboard = () => (
          <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Printer size={20} color="var(--accent-primary)" /> Farm Status
          </h3>
-         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {[
-              { name: 'Prusa MK3S+', status: 'Printing (45%)', color: 'var(--warning)', active: true, progress: '45%' },
-              { name: 'Bambu Lab X1C', status: 'Printing (12%)', color: 'var(--warning)', active: true, progress: '12%' },
-              { name: 'Elegoo Mars 3', status: 'Idle', color: 'var(--success)', active: false, progress: '0%' },
-            ].map((printer, i) => (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {printers.map((printer, i) => (
                <div key={i} style={{ padding: '1.2rem', background: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: printer.active ? '0.75rem' : '0' }}>
                      <span style={{ fontWeight: 600, fontSize: '0.95rem' }}>{printer.name}</span>
@@ -89,10 +133,11 @@ const VendorDashboard = () => (
                   )}
                </div>
             ))}
-         </div>
+          </div>
+      </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default VendorDashboard;

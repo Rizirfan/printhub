@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Box, Sun, Moon } from 'lucide-react';
 
@@ -6,7 +6,24 @@ import CustomerDashboard from './pages/CustomerDashboard';
 import VendorDashboard from './pages/VendorDashboard';
 import LandingPage from './pages/LandingPage';
 
-const Navbar = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void }) => {
+
+interface Job {
+  id: string;
+  item: string;
+  material: string;
+  quality: string;
+  status: 'Pending' | 'In Progress' | 'Shipped' | 'Delivered';
+  rev: string;
+  time: string;
+  timestamp: Date;
+}
+
+const Navbar = ({ theme, toggleTheme, user, onLogin }: { 
+  theme: string, 
+  toggleTheme: () => void, 
+  user: any, 
+  onLogin: () => void 
+}) => {
   const location = useLocation();
   const isVendor = location.pathname === '/partner';
   const isLanding = location.pathname === '/';
@@ -21,7 +38,7 @@ const Navbar = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void
       <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
         {!isVendor && !isLanding && (
           <>
-            <a href="#" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.95rem' }}>Find Partners</a>
+            <Link to="/customer" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.95rem' }}>Find Partners</Link>
             <a href="#" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.95rem' }}>Materials</a>
           </>
         )}
@@ -34,8 +51,19 @@ const Navbar = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
-        <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem' }}>Log In</button>
-        <button className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>Sign Up</button>
+        {user ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Welcome, {user.name}</span>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.8rem' }}>
+              {user.name[0]}
+            </div>
+          </div>
+        ) : (
+          <>
+            <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem' }} onClick={onLogin}>Log In</button>
+            <button className="btn btn-primary" style={{ padding: '0.5rem 1rem' }} onClick={onLogin}>Sign Up</button>
+          </>
+        )}
       </div>
     </nav>
   );
@@ -43,22 +71,40 @@ const Navbar = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void
 
 function App() {
   const [theme, setTheme] = useState('dark');
+  const [user, setUser] = useState<{name: string} | null>(null);
+  const [jobs, setJobs] = useState<Job[]>([
+    { id: '#ORD-0921', item: 'Mechanical Keyboard Case', material: 'PLA Black', quality: 'Standard', status: 'Pending', rev: '$45.00', time: '6h 30m', timestamp: new Date() },
+    { id: '#ORD-0922', item: 'D&D Miniatures Set x4', material: 'Resin Gray', quality: 'High Detail', status: 'In Progress', rev: '$18.50', time: '2h 15m', timestamp: new Date() },
+    { id: '#ORD-0923', item: 'Drone Frame Prototype', material: 'ABS White', quality: 'Draft', status: 'Pending', rev: '$62.00', time: '8h 00m', timestamp: new Date() },
+  ]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  
+  const handleLogin = () => {
+    setUser({ name: 'Irfan' });
+  };
+
+  const addJob = (job: any) => {
+    setJobs(prev => [job, ...prev]);
+  };
+
+  const updateJobStatus = (id: string, status: Job['status']) => {
+    setJobs(prev => prev.map(job => job.id === id ? { ...job, status } : job));
+  };
 
   return (
     <BrowserRouter>
       <div className="app-container">
         <main className="main-content">
-          <Navbar theme={theme} toggleTheme={toggleTheme} />
+          <Navbar theme={theme} toggleTheme={toggleTheme} user={user} onLogin={handleLogin} />
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/customer" element={<CustomerDashboard />} />
-            <Route path="/partner" element={<VendorDashboard />} />
+            <Route path="/customer" element={<CustomerDashboard addJob={addJob} />} />
+            <Route path="/partner" element={<VendorDashboard jobs={jobs} updateJobStatus={updateJobStatus} />} />
           </Routes>
         </main>
       </div>

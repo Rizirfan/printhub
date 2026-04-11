@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { UploadCloud, Box, Settings, MapPin, Truck, CreditCard } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -13,10 +13,21 @@ const Hero = () => (
   </div>
 );
 
-const UploadSection = () => {
+const UploadSection = ({ addJob }: { addJob: (job: any) => void }) => {
   const [file, setFile] = useState<File | null>(null);
   const [material, setMaterial] = useState('PLA');
   const [quality, setQuality] = useState('Standard (0.2mm)');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const pricingMap: Record<string, number> = {
+    'PLA': 19.25,
+    'ABS': 24.50,
+    'Resin': 32.00
+  };
+
+  const currentPrice = pricingMap[material] || 19.25;
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -25,8 +36,53 @@ const UploadSection = () => {
     }
   };
 
+  const handleFileClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleFindPartners = () => {
+    if (!file) return;
+    setIsSubmitting(true);
+    
+    // Simulate process
+    setTimeout(() => {
+      const newJob = {
+        id: `#ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+        item: file.name.split('.')[0],
+        material: `${material} ${material === 'Resin' ? 'Gray' : 'Black'}`,
+        quality: quality.split(' ')[0],
+        status: 'Pending',
+        rev: `$${currentPrice.toFixed(2)}`,
+        time: '4h 15m',
+        timestamp: new Date()
+      };
+      
+      addJob(newJob);
+      setIsSubmitting(false);
+      setIsSuccess(true);
+      
+      setTimeout(() => {
+        setIsSuccess(false);
+        setFile(null);
+      }, 3000);
+    }, 1500);
+  };
+
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '2rem' }}>
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        style={{ display: 'none' }} 
+        accept=".stl,.obj" 
+        onChange={handleFileChange} 
+      />
       {/* Viewport / Upload Box */}
       <motion.div 
         className="glass-panel" 
@@ -55,6 +111,7 @@ const UploadSection = () => {
           <div 
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
+            onClick={handleFileClick}
             style={{ flex: 1, border: '2px dashed var(--border-color)', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', cursor: 'pointer', transition: 'all 0.3s' }}
             onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-primary)'}
             onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
@@ -121,11 +178,16 @@ const UploadSection = () => {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
              <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>Estimated Total</span>
-             <span className="gradient-text" style={{ fontSize: '2rem', fontWeight: 800 }}>$19.25</span>
+             <span className="gradient-text" style={{ fontSize: '2rem', fontWeight: 800 }}>${currentPrice.toFixed(2)}</span>
           </div>
 
-          <button className="btn btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1.1rem' }} disabled={!file}>
-            Find Local Printing Partners
+          <button 
+            className={`btn ${isSuccess ? 'btn-success' : 'btn-primary'}`} 
+            style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', background: isSuccess ? 'var(--success)' : undefined }} 
+            disabled={!file || isSubmitting || isSuccess}
+            onClick={handleFindPartners}
+          >
+            {isSubmitting ? 'Searching...' : isSuccess ? 'Job Posted!' : 'Find Local Printing Partners'}
           </button>
         </div>
       </div>
@@ -159,10 +221,10 @@ const Features = () => (
   </div>
 );
 
-const CustomerDashboard = () => (
+const CustomerDashboard = ({ addJob }: { addJob: (job: any) => void }) => (
   <>
     <Hero />
-    <UploadSection />
+    <UploadSection addJob={addJob} />
     <Features />
   </>
 );
