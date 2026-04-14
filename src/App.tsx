@@ -6,6 +6,7 @@ import CustomerDashboard from './pages/CustomerDashboard';
 import VendorDashboard from './pages/VendorDashboard';
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
+import FindPartners from './pages/FindPartners';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 interface Job {
@@ -50,7 +51,7 @@ const Navbar = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void
       <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         {!isVendor && !isLanding && (
           <div className="desktop-only" style={{ display: 'flex', gap: '1.5rem', marginRight: '1rem' }}>
-            <Link to="/customer" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.95rem' }}>Find Partners</Link>
+            <Link to="/partners" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.95rem' }}>Find Partners</Link>
             <a href="#" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.95rem' }}>Materials</a>
           </div>
         )}
@@ -110,6 +111,11 @@ function AppContent() {
           <Route path="/customer" element={
             <ProtectedRoute role="user">
               <CustomerDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/partners" element={
+            <ProtectedRoute role="user">
+              <FindPartners />
             </ProtectedRoute>
           } />
           <Route path="/partner" element={

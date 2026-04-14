@@ -91,4 +91,14 @@ router.get('/partners/count', async (req, res) => {
   }
 });
 
+// Get all partners list
+router.get('/partners', async (req, res) => {
+  try {
+    const partners = await User.find({ role: 'partner' }).select('-password');
+    res.status(200).json({ status: 'success', data: { partners } });
+  } catch (err) {
+    res.status(500).json({ status: 'fail', message: err.message });
+  }
+});
+
 module.exports = router;
