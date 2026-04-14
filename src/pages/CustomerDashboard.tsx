@@ -4,9 +4,18 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
-const Hero = () => (
+const Hero = ({ onlinePartners }: { onlinePartners: number }) => (
   <div style={{ textAlign: 'center', padding: '5rem 0 3rem 0' }} className="animate-fade-in">
-    <h1 style={{ fontSize: '4rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1 }}>
+    
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-glass-light)', padding: '0.5rem 1rem', borderRadius: '40px', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.9rem', border: '1px solid var(--border-color)', marginBottom: '2rem' }}>
+      <span style={{ position: 'relative', display: 'flex', width: '10px', height: '10px' }}>
+         <span className="animate-ping" style={{ position: 'absolute', display: 'inline-flex', height: '100%', width: '100%', borderRadius: '50%', background: 'var(--success)', opacity: 0.75 }}></span>
+         <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', width: '10px', height: '10px', background: 'var(--success)' }}></span>
+      </span>
+      {onlinePartners} Printing Partners Online Now
+    </div>
+
+    <h1 style={{ fontSize: '4rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1 }} className="hero-title">
       The Global <span className="gradient-text">3D Printing</span> Marketplace
     </h1>
     <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2.5rem', lineHeight: 1.6 }}>
@@ -232,6 +241,7 @@ const Features = () => (
 
 const CustomerDashboard = () => {
   const [myJobs, setMyJobs] = useState<any[]>([]);
+  const [onlinePartners, setOnlinePartners] = useState(0);
   const { token } = useAuth();
 
   const fetchJobs = async () => {
@@ -245,13 +255,23 @@ const CustomerDashboard = () => {
     }
   };
 
+  const fetchPartners = async () => {
+    try {
+      const res = await axios.get('/api/auth/partners/count');
+      setOnlinePartners(res.data.data.count);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
+    fetchPartners();
     if (token) fetchJobs();
   }, [token]);
 
   return (
     <>
-      <Hero />
+      <Hero onlinePartners={onlinePartners} />
       <UploadSection refetchJobs={fetchJobs} />
       
       {/* Active Jobs Display */}
