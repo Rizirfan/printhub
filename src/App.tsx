@@ -93,25 +93,12 @@ const Navbar = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void
 
 function AppContent() {
   const [theme, setTheme] = useState('dark');
-  const [jobs, setJobs] = useState<Job[]>([
-    { id: '#ORD-0921', item: 'Mechanical Keyboard Case', material: 'PLA Black', quality: 'Standard', status: 'Pending', rev: '$45.00', time: '6h 30m', timestamp: new Date() },
-    { id: '#ORD-0922', item: 'D&D Miniatures Set x4', material: 'Resin Gray', quality: 'High Detail', status: 'In Progress', rev: '$18.50', time: '2h 15m', timestamp: new Date() },
-    { id: '#ORD-0923', item: 'Drone Frame Prototype', material: 'ABS White', quality: 'Draft', status: 'Pending', rev: '$62.00', time: '8h 00m', timestamp: new Date() },
-  ]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-  
-  const addJob = (job: any) => {
-    setJobs(prev => [job, ...prev]);
-  };
-
-  const updateJobStatus = (id: string, status: Job['status']) => {
-    setJobs(prev => prev.map(job => job.id === id ? { ...job, status } : job));
-  };
 
   return (
     <div className="app-container">
@@ -122,12 +109,12 @@ function AppContent() {
           <Route path="/login" element={<AuthPage />} />
           <Route path="/customer" element={
             <ProtectedRoute role="user">
-              <CustomerDashboard addJob={addJob} />
+              <CustomerDashboard />
             </ProtectedRoute>
           } />
           <Route path="/partner" element={
             <ProtectedRoute role="partner">
-              <VendorDashboard jobs={jobs} updateJobStatus={updateJobStatus} />
+              <VendorDashboard />
             </ProtectedRoute>
           } />
         </Routes>

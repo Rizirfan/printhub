@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
+const jobRoutes = require('./routes/jobs');
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ app.use(async (req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/jobs', jobRoutes);
 
 app.get('/', (req, res) => {
   res.send('PrintHub API is running...');

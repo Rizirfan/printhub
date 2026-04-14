@@ -1,19 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Printer, Clock, CheckCircle, DollarSign, Inbox, Activity, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
-interface Job {
-  id: string;
-  item: string;
-  material: string;
-  quality: string;
-  status: 'Pending' | 'In Progress' | 'Shipped' | 'Delivered';
-  rev: string;
-  time: string;
-  timestamp: Date;
-}
-
-const VendorDashboard = ({ jobs, updateJobStatus }: { jobs: Job[], updateJobStatus: (id: string, status: Job['status']) => void }) => {
+const VendorDashboard = () => {
+  const { token } = useAuth();
+  const [jobs, setJobs] = useState<any[]>([]);
   const [printers, setPrinters] = useState([
     { name: 'Prusa MK3S+', status: 'Printing (45%)', color: 'var(--warning)', active: true, progress: '45%' },
     { name: 'Bambu Lab X1C', status: 'Printing (12%)', color: 'var(--warning)', active: true, progress: '12%' },
@@ -32,13 +25,36 @@ const VendorDashboard = ({ jobs, updateJobStatus }: { jobs: Job[], updateJobStat
     }]);
   };
 
-  const handleJobAction = (id: string, currentStatus: Job['status']) => {
-    if (currentStatus === 'Pending') {
-      updateJobStatus(id, 'In Progress');
-    } else if (currentStatus === 'In Progress') {
-      updateJobStatus(id, 'Shipped');
-    } else if (currentStatus === 'Shipped') {
-      updateJobStatus(id, 'Delivered');
+  const fetchJobs = async () => {
+    try {
+      const res = await axios.get('/api/jobs', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setJobs(res.data.data.jobs);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (token) fetchJobs();
+  }, [token]);
+
+  const handleJobAction = async (id: string, currentStatus: string) => {
+    let nextStatus = '';
+    if (currentStatus === 'Pending') nextStatus = 'In Progress';
+    else if (currentStatus === 'In Progress') nextStatus = 'Shipped';
+    else if (currentStatus === 'Shipped') nextStatus = 'Delivered';
+    
+    if (!nextStatus) return;
+
+    try {
+      await axios.put(`/api/jobs/${id}`, { status: nextStatus }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchJobs(); // Refetch updated jobs
+    } catch (err) {
+      console.error("Error updating job:", err);
     }
   };
 
@@ -85,7 +101,7 @@ const VendorDashboard = ({ jobs, updateJobStatus }: { jobs: Job[], updateJobStat
                  <div>
                    <p style={{ fontWeight: 600, marginBottom: '0.35rem', fontSize: '1.05rem' }}>{job.item}</p>
                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                     <span style={{ color: 'var(--accent-primary)' }}>{job.id}</span> • {job.material} • Est: {job.time}
+                     <span style={{ color: 'var(--accent-primary)' }}>{job.idTag}</span> • {job.material} • Est: {job.time}
                    </p>
                  </div>
                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -96,7 +112,7 @@ const VendorDashboard = ({ jobs, updateJobStatus }: { jobs: Job[], updateJobStat
                    <button 
                     className={`btn ${job.status === 'Pending' ? 'btn-primary' : 'btn-secondary'}`} 
                     style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
-                    onClick={() => handleJobAction(job.id, job.status)}
+                    onClick={() => handleJobAction(job._id, job.status)}
                    >
                      {job.status === 'Pending' ? 'Accept Job' : job.status === 'In Progress' ? 'Ship Item' : 'Mark Delivered'}
                    </button>

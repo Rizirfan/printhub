@@ -1,6 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { UploadCloud, Box, Settings, MapPin, Truck, CreditCard } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { UploadCloud, Box, Settings, MapPin, Truck, CreditCard, Clock, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const Hero = () => (
   <div style={{ textAlign: 'center', padding: '5rem 0 3rem 0' }} className="animate-fade-in">
@@ -13,7 +15,8 @@ const Hero = () => (
   </div>
 );
 
-const UploadSection = ({ addJob }: { addJob: (job: any) => void }) => {
+const UploadSection = ({ refetchJobs }: { refetchJobs: () => void }) => {
+  const { token } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [material, setMaterial] = useState('PLA');
   const [quality, setQuality] = useState('Standard (0.2mm)');
@@ -50,28 +53,33 @@ const UploadSection = ({ addJob }: { addJob: (job: any) => void }) => {
     if (!file) return;
     setIsSubmitting(true);
     
-    // Simulate process
-    setTimeout(() => {
-      const newJob = {
-        id: `#ORD-${Math.floor(1000 + Math.random() * 9000)}`,
-        item: file.name.split('.')[0],
-        material: `${material} ${material === 'Resin' ? 'Gray' : 'Black'}`,
-        quality: quality.split(' ')[0],
-        status: 'Pending',
-        rev: `$${currentPrice.toFixed(2)}`,
-        time: '4h 15m',
-        timestamp: new Date()
-      };
-      
-      addJob(newJob);
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      
-      setTimeout(() => {
-        setIsSuccess(false);
-        setFile(null);
-      }, 3000);
-    }, 1500);
+    // POST to backend
+    setTimeout(async () => {
+      try {
+        await axios.post('/api/jobs', {
+          item: file.name.split('.')[0],
+          material: `${material} ${material === 'Resin' ? 'Gray' : 'Black'}`,
+          quality: quality.split(' ')[0],
+          rev: `$${currentPrice.toFixed(2)}`,
+          time: '4h 15m',
+          idTag: `#ORD-${Math.floor(1000 + Math.random() * 9000)}`
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        setIsSubmitting(false);
+        setIsSuccess(true);
+        refetchJobs(); // Auto update list
+        
+        setTimeout(() => {
+          setIsSuccess(false);
+          setFile(null);
+        }, 3000);
+      } catch (err) {
+        console.error(err);
+        setIsSubmitting(false);
+      }
+    }, 1000);
   };
 
   return (
@@ -222,12 +230,63 @@ const Features = () => (
   </div>
 );
 
-const CustomerDashboard = ({ addJob }: { addJob: (job: any) => void }) => (
-  <>
-    <Hero />
-    <UploadSection addJob={addJob} />
-    <Features />
-  </>
-);
+const CustomerDashboard = () => {
+  const [myJobs, setMyJobs] = useState<any[]>([]);
+  const { token } = useAuth();
+
+  const fetchJobs = async () => {
+    try {
+      const res = await axios.get('/api/jobs', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMyJobs(res.data.data.jobs);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (token) fetchJobs();
+  }, [token]);
+
+  return (
+    <>
+      <Hero />
+      <UploadSection refetchJobs={fetchJobs} />
+      
+      {/* Active Jobs Display */}
+      {myJobs.length > 0 && (
+        <div style={{ marginTop: '4rem', marginBottom: '2rem' }}>
+          <h2 className="section-title" style={{ fontSize: '2rem' }}>Your Active Prints</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
+            {myJobs.map((job) => (
+              <motion.div 
+                key={job._id}
+                className="glass-panel" 
+                style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <div>
+                  <h4 style={{ fontSize: '1.2rem', marginBottom: '0.25rem' }}>{job.item}</h4>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                    <span style={{ color: 'var(--accent-primary)' }}>{job.idTag}</span> • {job.material} • Status:{' '}
+                    <span style={{ color: job.status === 'Delivered' ? 'var(--success)' : 'var(--warning)', fontWeight: 600 }}>{job.status}</span>
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                   <p style={{ fontWeight: 800, fontSize: '1.2rem' }}>{job.rev}</p>
+                   <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Est: {job.time}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <Features />
+    </>
+  );
+};
 
 export default CustomerDashboard;
