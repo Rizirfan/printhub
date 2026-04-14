@@ -1,11 +1,12 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Box, Sun, Moon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { Box, Sun, Moon, LogOut } from 'lucide-react';
 
 import CustomerDashboard from './pages/CustomerDashboard';
 import VendorDashboard from './pages/VendorDashboard';
 import LandingPage from './pages/LandingPage';
-
+import AuthPage from './pages/AuthPage';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 interface Job {
   id: string;
@@ -18,13 +19,24 @@ interface Job {
   timestamp: Date;
 }
 
-const Navbar = ({ theme, toggleTheme, user, onLogin }: { 
-  theme: string, 
-  toggleTheme: () => void, 
-  user: any, 
-  onLogin: () => void 
-}) => {
+const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: 'user' | 'partner' }) => {
+  const { user, token } = useAuth();
+  
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (role && user?.role !== role) {
+    return <Navigate to={user?.role === 'partner' ? '/partner' : '/customer'} replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+const Navbar = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const isVendor = location.pathname === '/partner';
   const isLanding = location.pathname === '/';
 
@@ -54,14 +66,24 @@ const Navbar = ({ theme, toggleTheme, user, onLogin }: {
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Welcome, {user.name}</span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.8rem' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.8rem', color: 'white' }}>
               {user.name[0]}
             </div>
+            <button 
+              onClick={() => {
+                logout();
+                navigate('/');
+              }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              title="Logout"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
         ) : (
           <>
-            <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem' }} onClick={onLogin}>Log In</button>
-            <button className="btn btn-primary" style={{ padding: '0.5rem 1rem' }} onClick={onLogin}>Sign Up</button>
+            <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem' }} onClick={() => navigate('/login')}>Log In</button>
+            <button className="btn btn-primary" style={{ padding: '0.5rem 1rem' }} onClick={() => navigate('/login')}>Sign Up</button>
           </>
         )}
       </div>
@@ -69,9 +91,8 @@ const Navbar = ({ theme, toggleTheme, user, onLogin }: {
   );
 };
 
-function App() {
+function AppContent() {
   const [theme, setTheme] = useState('dark');
-  const [user, setUser] = useState<{name: string} | null>(null);
   const [jobs, setJobs] = useState<Job[]>([
     { id: '#ORD-0921', item: 'Mechanical Keyboard Case', material: 'PLA Black', quality: 'Standard', status: 'Pending', rev: '$45.00', time: '6h 30m', timestamp: new Date() },
     { id: '#ORD-0922', item: 'D&D Miniatures Set x4', material: 'Resin Gray', quality: 'High Detail', status: 'In Progress', rev: '$18.50', time: '2h 15m', timestamp: new Date() },
@@ -84,10 +105,6 @@ function App() {
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   
-  const handleLogin = () => {
-    setUser({ name: 'Irfan' });
-  };
-
   const addJob = (job: any) => {
     setJobs(prev => [job, ...prev]);
   };
@@ -97,17 +114,34 @@ function App() {
   };
 
   return (
+    <div className="app-container">
+      <main className="main-content">
+        <Navbar theme={theme} toggleTheme={toggleTheme} />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/customer" element={
+            <ProtectedRoute role="user">
+              <CustomerDashboard addJob={addJob} />
+            </ProtectedRoute>
+          } />
+          <Route path="/partner" element={
+            <ProtectedRoute role="partner">
+              <VendorDashboard jobs={jobs} updateJobStatus={updateJobStatus} />
+            </ProtectedRoute>
+          } />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  return (
     <BrowserRouter>
-      <div className="app-container">
-        <main className="main-content">
-          <Navbar theme={theme} toggleTheme={toggleTheme} user={user} onLogin={handleLogin} />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/customer" element={<CustomerDashboard addJob={addJob} />} />
-            <Route path="/partner" element={<VendorDashboard jobs={jobs} updateJobStatus={updateJobStatus} />} />
-          </Routes>
-        </main>
-      </div>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
   );
 }

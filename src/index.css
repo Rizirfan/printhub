@@ -186,3 +186,12 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--accent-primary);
   box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.15);
 }
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
