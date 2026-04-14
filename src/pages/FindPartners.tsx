@@ -109,7 +109,7 @@ const FindPartners = () => {
             </div>
 
             <button className="btn btn-secondary" style={{ marginTop: 'auto', width: '100%', justifyContent: 'center' }}>
-              View Vendor Profile
+              Shop from {partner.name}
             </button>
           </motion.div>
         ))}
