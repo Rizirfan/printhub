@@ -64,8 +64,6 @@ const AuthPage = () => {
           maxWidth: '450px',
           background: 'var(--bg-secondary)',
           border: '1px solid var(--border-color)',
-          borderRadius: '24px',
-          padding: '2.5rem',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
           position: 'relative',
           overflow: 'hidden'

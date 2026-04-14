@@ -68,12 +68,12 @@ const LandingPage = () => {
       <PrintAnimation />
       
       {/* Hero Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '4rem', alignItems: 'center', padding: '2rem 0 6rem 0', position: 'relative', zIndex: 1 }}>
+      <div className="hero-grid" style={{ padding: '2rem 0 6rem 0', position: 'relative', zIndex: 1 }}>
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-glass-light)', padding: '0.5rem 1rem', borderRadius: '40px', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem', border: '1px solid var(--border-color)', marginBottom: '2rem' }}>
             <Zap size={16} /> Beta Access Now Open
           </div>
-          <h1 style={{ fontSize: '4.5rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1 }}>
+          <h1 className="hero-title">
             The Future of <br />
             <span className="gradient-text">Local Manufacturing</span>
           </h1>
@@ -134,11 +134,11 @@ const LandingPage = () => {
       {/* Portals Section */}
       <div id="portals" style={{ padding: '4rem 0 6rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem' }}>Choose Your Path</h2>
+          <h2 className="section-title">Choose Your Path</h2>
           <p style={{ fontSize: '1.15rem', color: 'var(--text-secondary)' }}>Are you looking to manufacture a part, or are you offering a service?</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', maxWidth: '1000px', width: '100%' }}>
+        <div className="responsive-grid-2" style={{ maxWidth: '1000px', width: '100%' }}>
           {/* Customer Portal */}
           <Link to="/customer" style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
             <motion.div 
@@ -184,11 +184,11 @@ const LandingPage = () => {
       {/* How it Works / Value Props */}
       <div id="how-it-works" style={{ padding: '6rem 0', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem' }}>Why Choose PrintHub?</h2>
+          <h2 className="section-title">Why Choose PrintHub?</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>We bridge the gap between creators and local manufacturers.</p>
         </div>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3rem' }}>
+        <div className="responsive-grid-3">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ width: '60px', height: '60px', background: 'var(--bg-glass)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)', border: '1px solid var(--border-color)' }}>
               <Map size={28} />
@@ -216,11 +216,11 @@ const LandingPage = () => {
       {/* Printing Technologies */}
       <div style={{ padding: '6rem 0', borderBottom: '1px solid var(--border-color)' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem' }}>Available Technologies</h2>
+          <h2 className="section-title">Available Technologies</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Access a wide variety of commercial and industrial 3D printing capabilities.</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3rem' }}>
+        <div className="responsive-grid-3">
           {/* FDM */}
           <motion.div className="glass-panel" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 }} whileHover={{ y: -10, boxShadow: '0 20px 40px rgba(0, 210, 255, 0.1)' }}>
             <img src="https://imgs.search.brave.com/cyj_h39x71mBkC0ZS2ayAR5RSQb3b8XAyGkCiPZ9634/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/c292b2wzZC5jb20v/Y2RuL3Nob3AvYXJ0/aWNsZXMvYWU0ZTlj/ZGI3ZmM0NGQzZDg5/NGM4NjhmZTQyZWVk/NDkuanBnP3Y9MTc1/MTUzMzEzNiZ3aWR0/aD0xNTAw" alt="FDM Printer" style={{ width: '100%', height: '220px', objectFit: 'cover', borderBottom: '1px solid var(--border-color)' }} />
@@ -265,11 +265,11 @@ const LandingPage = () => {
       {/* Printer Mechanics Section */}
       <div style={{ padding: '6rem 0', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-secondary)' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem' }}>Printer Mechanics Supported</h2>
+          <h2 className="section-title">Printer Mechanics Supported</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Our network utilizes advanced kinematics to ensure fast delivery and precise tolerances.</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', maxWidth: '1000px', margin: '0 auto', padding: '0 2rem' }}>
+        <div className="responsive-grid-3" style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 2rem' }}>
           <motion.div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', background: 'var(--bg-primary)' }} whileHover={{ y: -5, borderColor: 'var(--accent-primary)' }}>
             <h3 style={{ fontSize: '1.4rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <Settings size={22} color="var(--accent-primary)" /> Cartesian (Moving Bed)
@@ -295,7 +295,7 @@ const LandingPage = () => {
 
       {/* Footer Section */}
       <footer style={{ borderTop: '1px solid var(--border-color)', paddingTop: '4rem', marginTop: '4rem', paddingBottom: '2rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '3rem', maxWidth: '1200px', margin: '0 auto', padding: '0 2rem', marginBottom: '3rem' }}>
+        <div className="responsive-grid-4" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem', marginBottom: '3rem' }}>
           
           {/* Brand & Description */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

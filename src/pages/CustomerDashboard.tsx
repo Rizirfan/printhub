@@ -75,7 +75,7 @@ const UploadSection = ({ addJob }: { addJob: (job: any) => void }) => {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '2rem' }}>
+    <div className="responsive-grid-2" style={{ marginTop: '2rem' }}>
       <input 
         type="file" 
         ref={fileInputRef} 
@@ -135,12 +135,13 @@ const UploadSection = ({ addJob }: { addJob: (job: any) => void }) => {
 
         <div className="form-group">
           <label className="form-label">Material Selection</label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
             {['PLA', 'ABS', 'Resin'].map(mat => (
               <button 
                 key={mat}
                 className="btn btn-secondary" 
                 style={{ 
+                  flex: '1 1 calc(33% - 0.75rem)',
                   background: material === mat ? 'var(--bg-glass-light)' : 'var(--bg-tertiary)',
                   borderColor: material === mat ? 'var(--accent-primary)' : 'var(--border-color)',
                   color: material === mat ? 'white' : 'var(--text-secondary)'
@@ -196,7 +197,7 @@ const UploadSection = ({ addJob }: { addJob: (job: any) => void }) => {
 };
 
 const Features = () => (
-  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem', marginTop: '6rem', paddingBottom: '4rem' }}>
+  <div className="responsive-grid-3" style={{ marginTop: '6rem', paddingBottom: '4rem' }}>
     <div style={{ textAlign: 'center' }}>
       <div style={{ width: '60px', height: '60px', background: 'var(--bg-glass)', border: '1px solid var(--border-color)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
         <MapPin size={28} color="var(--accent-primary)" />

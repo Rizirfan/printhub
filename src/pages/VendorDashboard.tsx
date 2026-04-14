@@ -53,7 +53,7 @@ const VendorDashboard = ({ jobs, updateJobStatus }: { jobs: Job[], updateJobStat
       </div>
 
     {/* Stats Row */}
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
+    <div className="responsive-grid-4" style={{ gap: '1.5rem', marginBottom: '3rem' }}>
       {[
         { label: "Today's Earnings", value: "$342.50", icon: <DollarSign color="var(--success)" size={24} />, trend: "+12%" },
         { label: "Active Orders", value: "8", icon: <Activity color="var(--accent-primary)" size={24} />, trend: "2 urgent" },
@@ -73,7 +73,7 @@ const VendorDashboard = ({ jobs, updateJobStatus }: { jobs: Job[], updateJobStat
       ))}
     </div>
 
-    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+    <div className="responsive-grid-2">
       {/* Incoming Orders */}
       <div className="glass-panel" style={{ padding: '2rem' }}>
          <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -81,7 +81,7 @@ const VendorDashboard = ({ jobs, updateJobStatus }: { jobs: Job[], updateJobStat
          </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {jobs.filter(j => j.status !== 'Delivered').map((job, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.2rem', background: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px solid var(--border-color)', transition: 'all 0.2s' }}>
+              <div key={i} className="flex-column-mobile" style={{ padding: '1.2rem', background: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px solid var(--border-color)', transition: 'all 0.2s', textAlign: 'center' }}>
                  <div>
                    <p style={{ fontWeight: 600, marginBottom: '0.35rem', fontSize: '1.05rem' }}>{job.item}</p>
                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
@@ -89,7 +89,7 @@ const VendorDashboard = ({ jobs, updateJobStatus }: { jobs: Job[], updateJobStat
                    </p>
                  </div>
                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                   <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                   <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                      <span style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '1.1rem' }}>{job.rev}</span>
                      <span style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', textTransform: 'uppercase', fontWeight: 700 }}>{job.status}</span>
                    </div>

@@ -47,7 +47,7 @@ const Navbar = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>Print<span className="gradient-text">Hub</span></h1>
       </Link>
       
-      <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+      <div className="navbar-links">
         {!isVendor && !isLanding && (
           <>
             <Link to="/customer" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.95rem' }}>Find Partners</Link>
@@ -65,7 +65,7 @@ const Navbar = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void
 
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Welcome, {user.name}</span>
+            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Welcome, {user.name.split(' ')[0]}</span>
             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.8rem', color: 'white' }}>
               {user.name[0]}
             </div>
@@ -81,10 +81,10 @@ const Navbar = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void
             </button>
           </div>
         ) : (
-          <>
-            <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem' }} onClick={() => navigate('/login')}>Log In</button>
-            <button className="btn btn-primary" style={{ padding: '0.5rem 1rem' }} onClick={() => navigate('/login')}>Sign Up</button>
-          </>
+          <div className="btn-container" style={{ display: 'flex', gap: '1rem' }}>
+            <button className="btn btn-secondary" onClick={() => navigate('/login')}>Log In</button>
+            <button className="btn btn-primary" onClick={() => navigate('/login')}>Sign Up</button>
+          </div>
         )}
       </div>
     </nav>
