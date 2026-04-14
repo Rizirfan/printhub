@@ -47,12 +47,12 @@ const Navbar = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>Print<span className="gradient-text">Hub</span></h1>
       </Link>
       
-      <div className="navbar-links">
+      <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         {!isVendor && !isLanding && (
-          <>
+          <div className="desktop-only" style={{ display: 'flex', gap: '1.5rem', marginRight: '1rem' }}>
             <Link to="/customer" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.95rem' }}>Find Partners</Link>
             <a href="#" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.95rem' }}>Materials</a>
-          </>
+          </div>
         )}
         
         <button 
